@@ -1,0 +1,18 @@
+{
+    "Baseline": {
+        "MAE": 11.69,
+        "RMSE": 15.08,
+        "MAPE": 53.9,
+        "Within_5_min_pct": 32.35
+    },
+    "ML_Model": {
+        "MAE": 3.84,
+        "RMSE": 4.84,
+        "MAPE": 17.11,
+        "Within_5_min_pct": 70.9
+    },
+    "Improvement": {
+        "MAE_improvement_pct": 67.15,
+        "RMSE_improvement_pct": 67.9
+    }
+}
