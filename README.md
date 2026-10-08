@@ -1,6 +1,7 @@
 # Public ETA Accuracy Tracker with ML Baseline
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Coming_Soon-success.svg)](#) *(Live deployed demo link placeholder)*
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Available-success.svg)](https://eta-accuracy-tracker-1.onrender.com)
+*Hosted on a free tier, so the first load may take ~30-60 seconds while the server wakes up.*
 
 Delivery ETA prediction accuracy is a critical metric for food delivery and logistics platforms like Swiggy, Zomato, and Delhivery. An inaccurate ETA directly degrades customer trust, user retention, and operational efficiency. This project is a full-stack tool that benchmarks delivery ETA prediction accuracy by comparing a simulated naive platform baseline against a custom-trained Machine Learning model. 
 
