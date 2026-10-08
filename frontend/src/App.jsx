@@ -10,6 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 function App() {
   const [summary, setSummary] = useState(null)
   const [breakdown, setBreakdown] = useState(null)
+  const [error, setError] = useState(null)
   const [breakdownDim, setBreakdownDim] = useState('Weatherconditions')
   const [samples, setSamples] = useState([])
   const [liveResult, setLiveResult] = useState(null)
@@ -24,9 +25,34 @@ function App() {
     Delivery_person_Ratings: 4.5
   })
 
+  const fetchInitialData = async (retries = 3) => {
+    try {
+      setError(null)
+      const config = { timeout: 90000 }
+      const [summaryRes, samplesRes] = await Promise.all([
+        axios.get(`${API_URL}/summary`, config),
+        axios.get(`${API_URL}/sample-predictions?n=30`, config)
+      ])
+      setSummary(summaryRes.data)
+      setSamples(samplesRes.data)
+    } catch (err) {
+      if (retries > 0) {
+        setTimeout(() => fetchInitialData(retries - 1), 5000)
+      } else {
+        setError(err.message || 'Failed to connect to server')
+      }
+    }
+  }
+
   useEffect(() => {
-    axios.get(`${API_URL}/summary`).then(res => setSummary(res.data)).catch(console.error)
-    axios.get(`${API_URL}/sample-predictions?n=30`).then(res => setSamples(res.data)).catch(console.error)
+    fetchInitialData()
+
+    // Keep-alive ping every 10 minutes
+    const interval = setInterval(() => {
+      axios.get(`${API_URL}/summary`, { timeout: 10000 }).catch(() => {})
+    }, 10 * 60 * 1000)
+    
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -60,7 +86,21 @@ function App() {
     }))
   }
 
-  if (!summary) return <div className="flex items-center justify-center h-screen"><div className="text-2xl text-brandAccent animate-pulse">Initializing Neural Models...</div></div>
+  if (error) return (
+    <div className="flex flex-col items-center justify-center h-screen space-y-4">
+      <div className="text-xl text-amberBase">Connection Error: {error}</div>
+      <button onClick={() => fetchInitialData(3)} className="btn-primary mt-4 flex justify-center items-center gap-2">
+        Retry
+      </button>
+    </div>
+  )
+
+  if (!summary) return (
+    <div className="flex flex-col items-center justify-center h-screen space-y-6">
+      <div className="w-12 h-12 border-4 border-tealBase border-t-transparent rounded-full animate-spin"></div>
+      <div className="text-lg text-tealBase animate-pulse">Waking up the server (free hosting, can take up to 60 seconds)...</div>
+    </div>
+  )
 
   const maxVal = samples.length > 0 ? Math.ceil(Math.max(...samples.map(s => Math.max(s.actual_time, s.baseline_eta, s.ml_eta)))) : 60;
 
