@@ -5,6 +5,7 @@ import joblib
 import json
 import pandas as pd
 import numpy as np
+import os
 
 from pipeline import preprocess_pipeline
 from baseline import calculate_baseline_eta
@@ -13,9 +14,12 @@ from metrics import calculate_metrics
 app = FastAPI(title="ETA Tracker API")
 
 # Enable CORS
+# Allow requests from the frontend URL, defaulting to all if not set
+origins = os.getenv("FRONTEND_URL", "*").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
